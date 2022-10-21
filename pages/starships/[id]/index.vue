@@ -18,26 +18,26 @@
 </template>
 
 <script setup>
-// import { getUserLikes, addUserLike, removeUserLike } from "~/composables/useLike";
+import { getUserLikes, addUserLike, removeUserLike } from "~/composables/useLike";
 
 const route = useRoute();
-// const user = useState("user");
+const user = useState("user");
 
-// const item = ref(null);
-// const itemLikes = ref(null);
+const item = ref(null);
+const itemLikes = ref(null);
 
 const { data: ship } = await useFetch(
   `https://swapi.dev/api/starships/${route.params.id}`
 );
 
-/* const itemIds = [...data.value].map((item) => {
+/* const itemIds = [...data.value.results[0]].map((item) => {
   return item.id;
 });
 itemLikes.value = await getUserLikes(itemIds.toString()); */
 
 /* METHODS */
 
-/* async function likeItem(id) {
+async function likeItem(id) {
   if (!user.value) return useRouter().push("/login");
   try {
     const like = await addUserLike({ itemId: id, userId: user.value.id });
@@ -66,8 +66,9 @@ async function showItem(id) {
   const res = await Promise.all([
     useFetch(`https://swapi.dev/api/starships/${route.params.id}`),
   ]);
+  console.log(item.value, "item");
   item.value = {
     ...res[0].data.value[0],
   };
-} */
+}
 </script>

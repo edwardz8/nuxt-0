@@ -1,15 +1,14 @@
 <script setup>
-// import { ILike } from '~~/types/ILike'
-
-/* const props = defineProps({
+const props = defineProps({
   likes: {
-    type: Array<ILike>,
+    type: Array,
     default: []
   },
-  userId: { type: Number, default: undefined },
-}) */
+  userId: { type: Number },
+  starship: {}
+})
 
-const props = defineProps(['starship'])
+// const props = defineProps(['starship'])
 
 /*
 *** only url is present and no ID, we have to get an id from url
@@ -57,7 +56,7 @@ function unlikeItem(id, itemId) {
   <div
     class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-900/[.7]"
   >
-   <!--  <button
+   <button
       v-if="isLiked"
       @click="unlikeItem(userLike.id, item.id)"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
@@ -97,7 +96,7 @@ function unlikeItem(id, itemId) {
         />
       </svg>
       <span>{{ likesCount }} Likes</span>
-    </button> -->
+    </button>
     <div class="p-4 md:p-5">
       <h3 class="text-lg font-bold text-gray-800 dark:text-orange-200">
         {{ starship.name }}

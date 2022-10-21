@@ -1,36 +1,41 @@
 <script setup>
-
 const props = defineProps({
+  likes: {
+    type: Array,
+    default: [],
+  },
+  userId: { type: Number },
+  starship: {},
   name: {
-    type: String
+    type: String,
   },
   model: {
-    type: String
+    type: String,
   },
   manufacturer: {
-    type: String
+    type: String,
   },
   cargo_capacity: {
-    type: String
+    type: String,
   },
   starship_class: {
-    type: String
+    type: String,
   },
   cost_in_credits: {
-    type: String
+    type: String,
   },
   crew: {
-    type: String
+    type: String,
   },
   passengers: {
-    type: String
+    type: String,
   },
   hyperdrive_rating: {
-    type: String
-  }
-})
+    type: String,
+  },
+});
 
-/* const emit = defineEmits(['like-item', 'unlike-item']);
+const emit = defineEmits(['like-item', 'unlike-item']);
 
 const likesCount = computed(() => {
   return props.likes.length
@@ -54,14 +59,14 @@ function likeItem(id) {
 
 function unlikeItem(id, itemId) {
   emit('unlike-item', { id, itemId })
-} */
+}
 </script>
 
 <template>
   <div
     class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-900/[.7]"
   >
-   <!--  <button
+    <button
       v-if="isLiked"
       @click="unlikeItem(userLike.id, item.id)"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
@@ -101,7 +106,7 @@ function unlikeItem(id, itemId) {
         />
       </svg>
       <span>{{ likesCount }} Likes</span>
-    </button> -->
+    </button>
     <div class="p-4 md:p-5">
       <h3 class="text-lg font-bold text-gray-800 dark:text-orange-200">
         {{ props.name }}
