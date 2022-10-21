@@ -4,7 +4,6 @@ import { createSession, getSessionByAuthToken } from "~~/server/database/reposit
 import { IUser } from "~~/types/IUser"
 import { v4 as uuidv4 } from 'uuid'
 
-
 export async function makeSession(user: IUser, event: CompatibilityEvent): Promise<IUser> {
     const authToken = uuidv4().replaceAll('-', '')
     const session = await createSession({ authToken, userId: user.id })
