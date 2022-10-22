@@ -3,6 +3,7 @@ import { useUser } from "@/composables/useAuth";
 import { getUserLikes, addUserLike, removeUserLike } from "@/composables/useLike";
 const user = await useUser();
 
+/* what is difference */
 // import { useState } from "#app";
 // const user = useState('user')
 
