@@ -624,11 +624,13 @@ $ npx prisma init
 
 $ npx prisma db push 
 
-$ npx prisma migrate dev --name init 
-
-$ npx prisma migrate deploy 
+$ npx prisma db pull
 
 $ npx prisma migrate dev
+
+$ npx prisma migrate dev --name init
+
+$ npx prisma migrate deploy 
 
 ```
 
@@ -644,7 +646,7 @@ With that said, there is a lot to cover and to make it easier for the reader, I 
 
 When running ```$ npx prisma init ``` a schema file was created. The schema will be generated within the root of the project, specifically __/prisma/schema.prisma__, but for this tutorial it will reside inside __/server/database/schema.prisma__.
 
-Take the schema.prisma file and move it to the newly created __server/database directory__ and add the models below in schema.prisma. You can safely delete the prisma folder.
+Take the schema.prisma file and move it to the newly created __server/database__ directory and add the models below in __schema.prisma__. You can safely delete the prisma folder.
 
 ```js
 
@@ -1074,6 +1076,8 @@ export default async (event: CompatibilityEvent) => {
 
 ##### login.ts
 
+Another composable __useBody__ is used here to pass the email and password input values of the form and attach them to the body of the request. There's also a variable assigned which is passed the __getUserByEmailWithPass__ method that queries the username and password of registered users. The *bcrypt* library is then implemented to check if the current password entered aligns with the previous password submitted when first registering. And finally, once that request is finished -- only if the form values are correct -- the __makeSession__ is called so a new user session can be initiated for the new logged in user.
+
 ```js
 // login.ts
 
@@ -1119,8 +1123,6 @@ export default async (event: CompatibilityEvent) => {
 }
 
 ```
-
-
 
 ========= FRONT END ==========
 
@@ -1250,22 +1252,271 @@ export default defineNuxtRouteMiddleware(async (to) => {
 ```
 
 
+#### User and Header Components
+
+Next, create two components, __User.vue__ and __SiteHeader.vue__.
+
+The state of the user through the composable __useState__ is passed to a *user* variable. Then we have an external method from the vueuse core library __onClickOutside__ which takes the null value of a __ref__ *userActions* and will assign the other __ref__ -- a boolean true-false value -- *hideActions* so a dynamic class can be toggled if a user is logged in.
+
+```js
+// components/User.vue
+
+<script setup lang="ts">
+import { IUser } from "~/types/IUser";
+import { ref } from "@vue/reactivity";
+import { userLogout } from "~/composables/useAuth";
+import { useState } from "#app";
+import { onClickOutside } from "@vueuse/core";
+
+const user = useState<IUser>("user");
+
+const logout = userLogout;
+
+const hideActions = ref(true);
+const userActions = ref(null);
+
+onClickOutside(userActions, () => (hideActions.value = true));
+</script>
+
+<template>
+  <div @click="hideActions = !hideActions" ref="userActions" class="flex items-center justify-end md:flex-1">
+    <span class="mr-2">
+      <strong>{{ user.username }}</strong>
+    </span>
+
+    <ul
+      :class="[{ hidden: hideActions }]"
+      class="dropdown-menu min-w-max absolute bottom bg-white text-base z-100 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 top- m-0 bg-clip-padding border-none"
+      aria-labelledby="dropdownMenuButton1"
+    >
+      <li @click="logout">
+        <a
+          class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-800 hover:bg-gray-400"
+          href="#"
+          >logout</a
+        >
+      </li>
+    </ul>
+  </div>
+</template>
+
+```
+
+#### SiteHeader.vue
+
+A simple navigation bar will do for now, but more details can be added easily down the road. For now, if a user is logged into the app the navigation will display the user name and a dropdown menu to allow them to logout. If they are not logged in, both a 'Sign up' and 'Sign in' button will be displayed. The logic for this is written in __User.vue__.
+
+```js
+// components/SiteHeader.vue
+
+<script setup lang="ts">
+import { useState } from "#app";
+
+const user = useState("user");
+</script>
+
+<template>
+  <header class="site-header">
+    <div class="wrapper">
+      <NuxtLink to="/" class="no-underline">
+        <figure class="site-logo">
+          <h1>swspecs</h1>
+        </figure>
+      </NuxtLink>
+
+      <nav class="site-nav">
+        <ul class="links">
+          <div class="flex items-center justify-end md:flex-1 lg:w-0">
+            <User v-if="user" :user="user" />
+
+            <li class="link">
+              <nuxt-link
+                v-if="!user"
+                to="/register"
+                class="transition duration-500 hover:scale-110 mr-8 whitespace-nowrap inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gray-800 hover:bg-gray-600"
+              >
+                Sign up
+              </nuxt-link>
+            </li>
+
+            <li class="link">
+              <nuxt-link
+                v-if="!user"
+                to="/login"
+                class="whitespace-nowrap text-base font-medium text-gray-500 hover:text-gray-900"
+              >
+                Sign in
+              </nuxt-link>
+            </li>
+          </div>
+        </ul>
+      </nav>
+    </div>
+  </header>
+</template>
+
+<style scoped>
+.site-header {
+  @apply sticky top-0 w-full p-4 bg-slate-100 bg-opacity-40 border-b-2 border-white border-opacity-30 backdrop-blur-lg z-20;
+}
+.site-header > .wrapper {
+  @apply flex items-center justify-between max-w-6xl m-auto;
+}
+.site-logo {
+  @apply font-black text-lg;
+}
+</style>
+
+```
 
 
-#### useNuxtApp 
+
+#### app.vue
 
 In __app.vue__, the implementation of useNuxtApp forces a scroll to the top of the page on navigation to any page. Referencing: https://v3.nuxtjs.org/api/composables/use-nuxt-app/ 
 
+```js
+// app.vue
+
+<template>
+  <div>
+    <SiteHeader />
+    <NuxtPage />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useUser } from "~/composables/useAuth";
+
+await useUser();
+</script>
 
 
+```
 
-### User.vue
-
-The state of the user is passed to a *user* variable. 
-
+Now an individual can move around in the application as a logged in user if they choose! 
 
 
+## Emitting Events: Likes 
 
+Back in the __server/database__ folder, in the __schema.prisma__ file we can add a Likes model so we can then create the functionality of liking items. Once the new model is in place, run the migration to the Prisma database with: ```npx prisma migrate dev && npx prisma db push```.
+
+```js
+// schema.prisma 
+
+model Like {
+  id       Int @id @default(autoincrement())
+  userId   Int
+  itemId Int
+}
+
+```
+
+Then in the same __server/database__ folder, navigate to the __repositories__ directory and create a __likeRepository.ts__ file to add the Prisma queries for liking items.
+
+For getting likes by user, a playerId parameter is passed to the function that is then assigned to an idArray variable and then used as the itemId. Then for the addLike function, the .create method from Prisma is used to pass the id's of both the user and item.
+
+```js
+// server/database/repositories/likeRepository.ts 
+
+import prisma from '../client'
+import { ILike } from '~~/types/ILike'
+
+export async function getLikesByUser(playerId) {
+    const idArray = playerId.split(',').map(Number)
+    return await prisma.like.findMany({
+        where: {
+            itemId: { in: idArray }
+        },
+        select: {
+            id: true,
+            itemId: true,
+            userId: true
+        }
+    })
+}
+
+export async function addLike(data: ILike) {
+    const like = await prisma.like.create({
+        data: {
+            userId: data.userId,
+            itemId: data.playerId
+        }
+    })
+
+    return like
+}
+
+export async function deleteLike(data) {
+    await prisma.like.delete({
+        where: {
+            id: +data.id,
+        },
+    })
+    return 'Unliked successfully!'
+}
+
+
+```
+
+Next, move back to the __types__ folder and add an __ILike.ts__ file:
+
+```js
+// types/ILike.ts
+
+export interface ILike {
+    id?: number 
+    userId: number 
+    itemId: number 
+}
+
+```
+
+Now, in the __server/api__ directory, create a new folder __like__ and add an __addLike.ts__ file.
+
+```js
+// server/api/like/addLike.ts 
+
+import { CompatibilityEvent } from 'h3'
+import { addLike } from '~/server/database/repositories/likeRepository';
+
+export default async (event: CompatibilityEvent) => {
+    const body = await useBody(event)
+    console.log(body)
+
+    const likeData = {
+        userId: body.userId,
+        itemId: body.itemId,
+    }
+
+    const like = await addLike(likeData)
+
+    return like
+}
+
+```
+
+And finally, back on the front-end side of the project directory, inside __composables__, create a new file: __useLike.ts__ and add the following utility methods so the code is more readable wherever the functionality is utilized across the app.
+
+```js
+// composables/useLike.ts
+
+export async function getUserLikes(itemId: string) {
+    const like = await $fetch('/api/like/getLikes?itemId=' + itemId, { method: 'GET' })
+    return like
+}
+
+export async function addUserLike({ itemId, userId }) {
+    const like = await $fetch('/api/like/addLike', { method: 'POST', body: { userId: userId, itemId: itemId } })
+    return like
+}
+
+export async function removeUserLike(likeId) {
+    const res = await $fetch('/api/like/deleteLike?likeId=' + likeId, { method: 'GET' })
+    return res
+}
+
+```
 
 
 

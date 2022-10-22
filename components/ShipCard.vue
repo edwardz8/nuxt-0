@@ -1,66 +1,90 @@
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
+  id: {
+    type: String,
+  },
   likes: {
     type: Array,
-    default: []
+    default: [],
   },
+  starship: {},
   userId: {
     type: Number,
-    default: undefined
   },
-  starship: Object
-})
-
-/*
-*** only url is present and no ID, we have to get an id from url
-*/
-const getId = (url) => {
-    try {
-        const arr = url.split('/')
-        return arr[arr.length - 2]
-    } catch (error) {
-        return ''
-    }
-}
+  name: {
+    type: String,
+  },
+  model: {
+    type: String,
+  },
+  manufacturer: {
+    type: String,
+  },
+  cargo_capacity: {
+    type: String,
+  },
+  starship_class: {
+    type: String,
+  },
+  cost_in_credits: {
+    type: String,
+  },
+  crew: {
+    type: String,
+  },
+  passengers: {
+    type: String,
+  },
+  hyperdrive_rating: {
+    type: String,
+  },
+});
 
 /* Likes Count */
 const likesCount = computed(() => {
-  return props.likes.length
-})
+  return props.likes.length;
+});
 
-/* if a user has liked an item or not */
 const userLike = computed(() => {
-  return props.likes.find((like) => like.userId === props.userId)
-})
+  return props.likes.find((like) => like.userId === props.userId);
+});
 
 const isLiked = computed(() => {
-  if (!props.userId) return false
+  if (!props.userId) return false;
   const index = props.likes.findIndex((like) => {
-    return like.userId === props.userId
-  })
-  return index > -1 ? true : false
-})
+    return like.userId === props.userId;
+  });
+  return index > -1 ? true : false;
+});
 
 /* Emit Like Item and Unlike Item Events */
-const emit = defineEmits(['like-item', 'unlike-item']);
+const emit = defineEmits(["like-item", "unlike-item"]);
 
 function likeItem(id) {
-  emit('like-item', id)
+  emit("like-item", id);
 }
 
 function unlikeItem(id, itemId) {
-  emit('unlike-item', { id, itemId })
+  emit("unlike-item", { id, itemId });
 }
+
+const getId = (url) => {
+  try {
+    const arr = url.split("/");
+    return arr[arr.length - 2];
+  } catch (error) {
+    return "";
+  }
+};
 </script>
 
 <template>
   <div
     class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-900/[.7]"
   >
-   <button
+  <!--   <button
       v-if="isLiked"
       @click="unlikeItem(userLike.id, getId(starship.url))"
-      :disabled="!props.userId"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
     >
       <svg
@@ -80,7 +104,6 @@ function unlikeItem(id, itemId) {
     <button
       v-else
       type="button"
-      :disabled="!props.userId"
       @click="likeItem(getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
     >
@@ -99,33 +122,43 @@ function unlikeItem(id, itemId) {
         />
       </svg>
       <span>{{ likesCount }} Likes</span>
-    </button>
+    </button> -->
     <div class="p-4 md:p-5">
       <h3 class="text-lg font-bold text-gray-800 dark:text-orange-200">
-        {{ starship.name }}
+        {{ props.name }}
       </h3>
       <p class="mt-1 text-gray-800 dark:text-gray-400">
-        Model: {{ starship.model }}
+        Model: {{ props.model }}
         <br />
       </p>
       <p class="mt-1 text-gray-800 dark:text-gray-400">
-        Manufacturer: {{ starship.manufacturer }}
+        Manufacturer: {{ props.manufacturer }}
         <br />
       </p>
       <p class="mt-1 text-gray-800 dark:text-gray-400">
-        Capacity: {{ starship.cargo_capacity }}
+        Capacity: {{ props.cargo_capacity }}
         <br />
       </p>
       <p class="mt-1 text-gray-800 dark:text-gray-400">
-        Class: {{ starship.starship_class }}
+        Class: {{ props.starship_class }}
         <br />
       </p>
-      <NuxtLink
-        class="mt-3 py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-orange-400 text-white hover:bg-orange-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
-        :to="`/starships/` + getId(starship.url)"
-      >
-        View Starship
-      </NuxtLink>
+      <p class="mt-1 text-gray-800 dark:text-gray-400">
+        Rating: {{ props.hyperdrive_rating }}
+        <br />
+      </p>
+      <p class="mt-1 text-gray-800 dark:text-gray-400">
+        Cost: {{ props.cost_in_credits }}
+        <br />
+      </p>
+      <p class="mt-1 text-gray-800 dark:text-gray-400">
+        Crew #: {{ props.crew }}
+        <br />
+      </p>
+      <p class="mt-1 text-gray-800 dark:text-gray-400">
+        Passenger #: {{ props.passengers }}
+        <br />
+      </p>
     </div>
   </div>
 </template>
