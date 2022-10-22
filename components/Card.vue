@@ -5,9 +5,10 @@ const props = defineProps({
     default: []
   },
   userId: {
-    type: Number
+    type: Number,
+    default: undefined
   },
-  starship: {}
+  starship: Object
 })
 
 /*
@@ -59,6 +60,7 @@ function unlikeItem(id, itemId) {
    <button
       v-if="isLiked"
       @click="unlikeItem(userLike.id, getId(starship.url))"
+      :disabled="!props.userId"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
     >
       <svg
@@ -78,6 +80,7 @@ function unlikeItem(id, itemId) {
     <button
       v-else
       type="button"
+      :disabled="!props.userId"
       @click="likeItem(getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
     >

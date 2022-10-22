@@ -1,7 +1,10 @@
 <script setup>
-import { useUser } from '@/composables/useAuth'
-import { getUserLikes, addUserLike, removeUserLike } from '@/composables/useLike'
-const user = await useUser()
+import { useUser } from "@/composables/useAuth";
+import { getUserLikes, addUserLike, removeUserLike } from "@/composables/useLike";
+const user = await useUser();
+
+// import { useState } from "#app";
+// const user = useState('user')
 
 const results = ref({});
 const count = ref("");
@@ -10,7 +13,7 @@ const page = ref(1);
 const loadingNext = ref(false);
 const loadingPrev = ref(false);
 
-const likes = ref({})
+const likes = ref({});
 
 /* fetch data */
 const { data } = await useFetch("https://swapi.dev/api/starships");
@@ -28,7 +31,7 @@ const fetchPage = async (p) => {
     });
     page.value = p;
     results.value = data.value.results;
-    await fetchLikes()
+    await fetchLikes();
   } catch (error) {
     console.log(error);
   } finally {
@@ -44,63 +47,52 @@ const showNextPage = computed(() => {
 /* create id from url */
 const getId = (url) => {
   try {
-    const arr = url.split('/')
-    return arr[arr.length - 2]
+    const arr = url.split("/");
+    return arr[arr.length - 2];
   } catch (error) {
-    return ''
+    return "";
   }
-}
+};
 
 /* get likes based on user when loading next or previous page */
 const fetchLikes = async () => {
   const ids = results.value.map((item) => {
-    return getId(item.url)
-  })
-  const data = await getUserLikes(ids)
-  likes.value = data
-}
+    return getId(item.url);
+  });
+  const data = await getUserLikes(ids);
+  likes.value = data;
+};
 
-await fetchLikes()
+await fetchLikes();
 
 /* like item */
 const likeItem = async (itemId) => {
   const like = await addUserLike({
     itemId: itemId,
     userId: user.id,
-  })
-  const tempLikes = {...likes.value}
-  if (tempLikes[like.itemId]){
-    tempLikes[like.itemId].push(like)
+  });
+  const tempLikes = { ...likes.value };
+  if (tempLikes[like.itemId]) {
+    tempLikes[like.itemId].push(like);
   } else {
-    tempLikes[like.itemId] = [like]
+    tempLikes[like.itemId] = [like];
   }
-  likes.value = {...tempLikes}
-}
+  likes.value = { ...tempLikes };
+};
 
 /* unlike item */
-const unlikeItem =  async ({id, itemId})=>{
-    const index= likes.value[+itemId].findIndex(like=>like.id==id)
-    const tempLikes = {...likes.value}
-    tempLikes[+itemId].splice(index, 1)
-    likes.value = {...tempLikes}
-    await removeUserLike(id)
-}
+const unlikeItem = async ({ id, itemId }) => {
+  const index = likes.value[+itemId].findIndex((like) => like.id == id);
+  const tempLikes = { ...likes.value };
+  tempLikes[+itemId].splice(index, 1);
+  likes.value = { ...tempLikes };
+  await removeUserLike(id);
+};
 
 /* item likes count array */
 const itemLikes = (item) => {
-  return likes.value[item] || []
-}
-
-/* show item but user cannot like if not logged in */
-/* async function showItem(id) {
-  item.value = null;
-  const res = await Promise.all([
-    useFetch(`https://swapi.dev/api/starships/${route.params.id}`),
-  ]);
-  item.value = {
-    ...res[0].data.value[0],
-  };
-} */
+  return likes.value[item] || [];
+};
 </script>
 
 <template>
@@ -182,12 +174,12 @@ const itemLikes = (item) => {
     <div class="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 px-4">
       <Card
         v-for="ship in results"
-        :userId="user.id"
+        :starship="ship"
+        :user-id="user ? user.id : undefined"
+        :likes="itemLikes(getId(ship.url))"
+        :key="ship.name"
         @like-item="likeItem"
         @unlike-item="unlikeItem"
-        :likes="itemLikes(getId(ship.url))"
-        :starship="ship"
-        :key="ship.name"
       />
     </div>
   </div>

@@ -7,6 +7,7 @@ const props = defineProps({
     type: Array,
     default: [],
   },
+  starship: {},
   userId: {
     type: Number,
   },
@@ -81,9 +82,9 @@ const getId = (url) => {
   <div
     class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-900/[.7]"
   >
-    <button
+  <!--   <button
       v-if="isLiked"
-      @click="unlikeItem(userLike.id, id)"
+      @click="unlikeItem(userLike.id, getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
     >
       <svg
@@ -103,7 +104,7 @@ const getId = (url) => {
     <button
       v-else
       type="button"
-      @click="likeItem(+id)"
+      @click="likeItem(getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
     >
       <svg
@@ -121,7 +122,7 @@ const getId = (url) => {
         />
       </svg>
       <span>{{ likesCount }} Likes</span>
-    </button>
+    </button> -->
     <div class="p-4 md:p-5">
       <h3 class="text-lg font-bold text-gray-800 dark:text-orange-200">
         {{ props.name }}

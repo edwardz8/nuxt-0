@@ -13,7 +13,7 @@
         :passengers="ship.passengers"
         :hyperdrive_rating="ship.hyperdrive_rating"
         :likes="itemLikes"
-        :userId="user.id"
+        :userId="user ? user.id : undefined"
         :id="getId(ship.url)"
         @unlike-item="unlikeItem"
         @like-item="likeItem"
@@ -30,7 +30,7 @@ const route = useRoute();
 
 const user = await useUser();
 
-const itemLikes = ref([]);
+const itemLikes = ref(null);
 
 const loading = ref(false);
 loading.value = true;
