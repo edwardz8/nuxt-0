@@ -4,11 +4,11 @@ const props = defineProps({
     type: Array,
     default: []
   },
-  userId: { type: Number },
+  userId: {
+    type: Number
+  },
   starship: {}
 })
-
-// const props = defineProps(['starship'])
 
 /*
 *** only url is present and no ID, we have to get an id from url
@@ -58,7 +58,7 @@ function unlikeItem(id, itemId) {
   >
    <button
       v-if="isLiked"
-      @click="unlikeItem(userLike.id, item.id)"
+      @click="unlikeItem(userLike.id, getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
     >
       <svg
@@ -78,7 +78,7 @@ function unlikeItem(id, itemId) {
     <button
       v-else
       type="button"
-      @click="likeItem(item.id)"
+      @click="likeItem(getId(starship.url))"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
     >
       <svg

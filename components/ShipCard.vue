@@ -1,11 +1,15 @@
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
+  id: {
+    type: String,
+  },
   likes: {
     type: Array,
     default: [],
   },
-  userId: { type: Number },
-  starship: {},
+  userId: {
+    type: Number,
+  },
   name: {
     type: String,
   },
@@ -35,31 +39,42 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['like-item', 'unlike-item']);
-
+/* Likes Count */
 const likesCount = computed(() => {
-  return props.likes.length
-})
+  return props.likes.length;
+});
 
 const userLike = computed(() => {
-  return props.likes.find((like) => like.userId === props.userId)
-})
+  return props.likes.find((like) => like.userId === props.userId);
+});
 
 const isLiked = computed(() => {
-  if (!props.userId) return false
+  if (!props.userId) return false;
   const index = props.likes.findIndex((like) => {
-    return like.userId === props.userId
-  })
-  return index > -1 ? true : false
-})
+    return like.userId === props.userId;
+  });
+  return index > -1 ? true : false;
+});
+
+/* Emit Like Item and Unlike Item Events */
+const emit = defineEmits(["like-item", "unlike-item"]);
 
 function likeItem(id) {
-  emit('like-item', id)
+  emit("like-item", id);
 }
 
 function unlikeItem(id, itemId) {
-  emit('unlike-item', { id, itemId })
+  emit("unlike-item", { id, itemId });
 }
+
+const getId = (url) => {
+  try {
+    const arr = url.split("/");
+    return arr[arr.length - 2];
+  } catch (error) {
+    return "";
+  }
+};
 </script>
 
 <template>
@@ -68,7 +83,7 @@ function unlikeItem(id, itemId) {
   >
     <button
       v-if="isLiked"
-      @click="unlikeItem(userLike.id, item.id)"
+      @click="unlikeItem(userLike.id, id)"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
     >
       <svg
@@ -88,7 +103,7 @@ function unlikeItem(id, itemId) {
     <button
       v-else
       type="button"
-      @click="likeItem(item.id)"
+      @click="likeItem(+id)"
       class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
     >
       <svg

@@ -29,16 +29,16 @@ model Session {
 }
 
 model Like {
-  id       Int @id @default(autoincrement())
-  userId   Int
+  id     Int @id @default(autoincrement())
+  userId Int
   itemId Int
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
   userId    Int
-  itemId  Int
   comment   String
   createdAt DateTime @default(now()) @db.Timestamptz(3)
+  itemId    Int
   user      User     @relation(fields: [userId], references: [id])
 }
