@@ -62,7 +62,7 @@ await getLikes();
 
 /* like item based on user */
 async function likeItem(id) {
-  // if (!user.value) return useRouter().push("/login");
+  if (!user.value) return useRouter().push("/login");
   try {
     const like = await addUserLike({
       itemId: id,
