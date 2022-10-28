@@ -36,7 +36,9 @@ const loading = ref(false);
 loading.value = true;
 
 const { data: ship } = await useFetch(
-  `https://swapi.dev/api/starships/${route.params.id}`
+  `https://swapi.dev/api/starships/${route.params.id}`, {
+    initialCache: false 
+  }
 );
 
 /* METHODS */

@@ -1472,7 +1472,9 @@ export interface ILike {
 
 ```
 
-Now, in the __server/api__ directory, create a new folder __like__ and add an __addLike.ts__ file.
+Now, in the __server/api__ directory, create a new folder __like__ and add an __addLike.ts__, __deleteLike.ts__ and __getLikes.ts__ file.
+
+##### addLike.ts
 
 ```js
 // server/api/like/addLike.ts 
@@ -1495,6 +1497,51 @@ export default async (event: CompatibilityEvent) => {
 }
 
 ```
+
+##### deleteLike.ts
+
+```js
+// server/api/like/deleteLike.ts 
+
+import { deleteLike } from '~/server/database/repositories/likeRepository';
+
+export default defineEventHandler(async (event) => {
+    const query = await useQuery(event)
+    const likeId = query.likeId
+
+    const res = await deleteLike({ id: likeId })
+
+    return res
+})
+
+```
+
+##### getLikes.ts 
+
+```js
+// server/api/like/getLikes.ts
+
+import { getLikesByUser } from '~/server/database/repositories/likeRepository';
+
+export default defineEventHandler(async (event) => {
+    const query = await useQuery(event)
+    const itemId = query.itemId
+
+    const likes = await getLikesByUser(itemId)
+
+    const likesGroupedByItem = likes.reduce(function (r, a) {
+        r[a.itemId] = r[a.itemId] || []
+        r[a.itemId].push(a)
+        return r
+    }, Object.create(null))
+
+    return likesGroupedByItem
+
+})
+```
+
+
+
 
 And finally, back on the front-end side of the project directory, inside __composables__, create a new file: __useLike.ts__ and add the following utility methods so the code is more readable wherever the functionality is utilized across the app.
 
