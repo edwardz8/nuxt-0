@@ -3,10 +3,6 @@ import { useUser } from "@/composables/useAuth";
 import { getUserLikes, addUserLike, removeUserLike } from "@/composables/useLike";
 const user = await useUser();
 
-/* what is difference */
-// import { useState } from "#app";
-// const user = useState('user')
-
 const results = ref({});
 const count = ref("");
 const perPage = ref(6);
@@ -20,6 +16,16 @@ const likes = ref({});
 const { data } = await useFetch("https://swapi.dev/api/starships");
 results.value = data.value.results;
 count.value = data.value.count;
+
+/* const res = await Promise.all([
+  useFetch("https://swapi.dev/api/starships"),
+  useFetch("https://swapi.dev/api/vehicles"),
+]); */
+
+/* results.value = {
+  ...res[0].data.value.results[0],
+  results: res[1].data.value.results[0],
+}; */
 
 /* pagination and await likes from user if exists */
 const fetchPage = async (p) => {
