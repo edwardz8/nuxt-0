@@ -5,5 +5,8 @@ export default defineNuxtConfig({
         tailwindcss: {
             cssPath: '~/assets/css/main.css'
         }
+    },
+    build: {
+        transpile: ['chart.js']
     }
 })

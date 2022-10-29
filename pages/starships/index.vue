@@ -3,6 +3,9 @@ import { useUser } from "@/composables/useAuth";
 import { getUserLikes, addUserLike, removeUserLike } from "@/composables/useLike";
 const user = await useUser();
 
+const route = useRoute();
+
+const item = ref(null);
 const results = ref({});
 const count = ref("");
 const perPage = ref(6);
@@ -16,16 +19,6 @@ const likes = ref({});
 const { data } = await useFetch("https://swapi.dev/api/starships");
 results.value = data.value.results;
 count.value = data.value.count;
-
-/* const res = await Promise.all([
-  useFetch("https://swapi.dev/api/starships"),
-  useFetch("https://swapi.dev/api/vehicles"),
-]); */
-
-/* results.value = {
-  ...res[0].data.value.results[0],
-  results: res[1].data.value.results[0],
-}; */
 
 /* pagination and await likes from user if exists */
 const fetchPage = async (p) => {
@@ -100,6 +93,20 @@ const unlikeItem = async ({ id, itemId }) => {
 const itemLikes = (item) => {
   return likes.value[item] || [];
 };
+
+
+async function showItem(id, p) {
+  item.value = null;
+  const { data } = await useFetch(
+  `https://swapi.dev/api/starships/${route.params.id}`, {
+  }
+);
+
+  item.value = {
+    ...data.value.results[0],
+    stats: res[1].data.value.stats[0].splits[0],
+  };
+}
 </script>
 
 <template>
@@ -178,6 +185,9 @@ const itemLikes = (item) => {
       </a>
     </div>
 
+    <!-- off canvas chart -->
+    <off-canvas :item="item" />
+
     <div class="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-3 px-4">
       <Card
         v-for="ship in results"
@@ -187,6 +197,7 @@ const itemLikes = (item) => {
         :key="ship.name"
         @like-item="likeItem"
         @unlike-item="unlikeItem"
+        @show-item="showItem"
       />
     </div>
   </div>

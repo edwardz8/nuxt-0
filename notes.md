@@ -1540,10 +1540,7 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-
-
-
-And finally, back on the front-end side of the project directory, inside __composables__, create a new file: __useLike.ts__ and add the following utility methods so the code is more readable wherever the functionality is utilized across the app.
+And finally, back on the front-end side of the project directory, inside __composables__, create a new file: __useLike.ts__ and add the following utility methods so the code is more readable wherever the functionality is needed across the app.
 
 ```js
 // composables/useLike.ts
@@ -1565,10 +1562,277 @@ export async function removeUserLike(likeId) {
 
 ```
 
+## Emitting Like Events
+
+Now that the server-side logic is in place, navigate to the components folder and visit the __Card.vue__ component to add the logic to the interface and tie item likes to a user. You may copy all the code within the script tag below as it will be the end result for implementing likes. 
+
+For the UI, I'm using an outlined heart svg that will change color once an item is liked by a specific user; as long as you have some sort of button that allows individuals to see a change has actually taken place you may design with whichever icons and buttons you would like.
+
+You will notice several additions, beginning with both the __likes__ array and __userId__ props to pass to the component. There's also a __likesCount__ computed property to show the number of likes each item accumulates. The __userLike__ computed method determines which user has liked a specific item and the __isLiked__ computed loops through the items to find which ones have been liked by a user. We need these methods since likes and users are completely detached from the external API we are using for this application.
+
+And since likes are tied to a user, the __likeItem__ and __unlikeItem__ emitters are needed to capture the user id and item url, which in this particular case is the itemId.
+
+
+```js
+<script setup>
+const props = defineProps({
+  likes: {
+    type: Array,
+    default: [],
+  },
+  userId: {
+    type: Number,
+    default: undefined,
+  },
+  starship: Object,
+});
+
+/*
+ *** only url is present and no ID, we have to get an id from url
+ */
+const getId = (url) => {
+  try {
+    const arr = url.split("/");
+    return arr[arr.length - 2];
+  } catch (error) {
+    return "";
+  }
+};
+
+/* Likes Count */
+const likesCount = computed(() => {
+  return props.likes.length;
+});
+
+/* if a user has liked an item or not */
+const userLike = computed(() => {
+  return props.likes.find((like) => like.userId === props.userId);
+});
+
+const isLiked = computed(() => {
+  if (!props.userId) return false;
+  const index = props.likes.findIndex((like) => {
+    return like.userId === props.userId;
+  });
+  return index > -1 ? true : false;
+});
+
+/* Emit Like Item and Unlike Item Events */
+const emit = defineEmits(["like-item", "unlike-item"]);
+
+function likeItem(id) {
+  emit("like-item", id);
+}
+
+function unlikeItem(id, itemId) {
+  emit("unlike-item", { id, itemId });
+}
+</script>
+
+<template>
+  <div
+    class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-900/[.7]">
+      <button
+        v-if="isLiked"
+        @click="unlikeItem(userLike.id, getId(starship.url))"
+        :disabled="!props.userId"
+        class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-blue-500 hover:text-gray-300"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 21C8.38661 17.7733 2 13.7597 2 8.3951C2 5.37384 4.42 3 7.5 3C9.24 3 10.91 3.74441 12 5C13.09 3.74441 14.76 3 16.5 3C19.58 3 22 5.37384 22 8.3951C22 13.751 15.6214 17.7907 12 21Z"
+            fill="#2F80ED"
+          />
+        </svg>
+        <span>{{ likesCount }} Likes</span>
+      </button>
+      <button
+        v-else
+        type="button"
+        :disabled="!props.userId"
+        @click="likeItem(getId(starship.url))"
+        class="text-sm mt-1 py-2 px-2 inline-flex justify-center items-center gap-2 font-semibold text-gray-400 hover:text-gray-300"
+      >
+        <svg
+          width="20"
+          height="18"
+          viewBox="0 0 20 18"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M10 2C9.66042 1.60884 9.26455 1.26729 8.82781 0.982401C7.86267 0.352837 6.69792 0 5.5 0C2.42 0 0 2.37384 0 5.3951C0 6.46861 0.255742 7.48801 0.693829 8.45784C2.0526 11.4686 5.16576 14.0093 7.8455 16.1963C8.61699 16.8259 9.35256 17.4262 10 18C10.6474 17.4262 11.383 16.8259 12.1545 16.1963C14.8342 14.0093 17.9473 11.4687 19.3061 8.458C19.7442 7.48813 20 6.46866 20 5.3951C20 2.37384 17.58 0 14.5 0C13.3021 0 12.1373 0.352837 11.1722 0.982401C10.7354 1.26729 10.3396 1.60884 10 2ZM10 15.3699C10.3228 15.1024 10.6527 14.8326 10.9822 14.5633C11.2612 14.3351 11.5399 14.1073 11.8136 13.8813C12.9091 12.9769 13.9814 12.058 14.9309 11.095C16.106 9.90333 16.9793 8.75632 17.4879 7.62419C17.8233 6.8767 18 6.13633 18 5.3951C18 3.51455 16.5119 2 14.5 2C13.3116 2 12.2025 2.51373 11.5103 3.31111L10 5.05084L8.48971 3.31111C7.79748 2.51373 6.68843 2 5.5 2C3.48808 2 2 3.51455 2 5.3951C2 6.13633 2.17674 6.8767 2.51214 7.62419C3.02069 8.75633 3.89402 9.90333 5.06909 11.095C6.01864 12.058 7.09095 12.9769 8.18643 13.8813C8.46009 14.1073 8.73877 14.3351 9.01783 14.5633C9.34727 14.8326 9.67722 15.1024 10 15.3699Z"
+            fill="#222B45"
+          />
+        </svg>
+        <span>{{ likesCount }} Likes</span>
+      </button>
+  </div>
+</template>
+```
+
+Then in the parent component, __pages/starships/index.vue__ we can pass the props from the child and add the logic we need to wrap up the likes. Again you can copy everything within the script tag below as it will be the final code for adding likes.
+
+You will notice the new composables imported which were created earlier: __useUser__, __getUserLikes__, __addUserLike__ and __removeUserLike__. The __useUser__ composable will be passed to the user variable as users will not be able to like items if they are not signed in.
+
+The __fetchLikes__ function is an asynchronous method which will map over each of the items to see which users have liked them.
+
+```html
+
+<script setup>
+import { useUser } from "@/composables/useAuth";
+import { getUserLikes, addUserLike, removeUserLike } from "@/composables/useLike";
+const user = await useUser();
+
+const results = ref({});
+const count = ref("");
+const perPage = ref(6);
+const page = ref(1);
+const loadingNext = ref(false);
+const loadingPrev = ref(false);
+
+const likes = ref({});
+
+/* fetch data */
+const { data } = await useFetch("https://swapi.dev/api/starships");
+results.value = data.value.results;
+count.value = data.value.count;
+
+/* pagination and await likes from user if exists */
+const fetchPage = async (p) => {
+  if (p > page.value) loadingNext.value = true;
+  else loadingPrev.value = true;
+
+  try {
+    const { data } = await useFetch("https://swapi.dev/api/starships?page=" + p, {
+      initialCache: false,
+    });
+    page.value = p;
+    results.value = data.value.results;
+    await fetchLikes();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loadingNext.value = false;
+    loadingPrev.value = false;
+  }
+};
+
+const showNextPage = computed(() => {
+  return Math.floor(count.value / (page.value * perPage.value));
+});
+
+/* create id from url */
+const getId = (url) => {
+  try {
+    const arr = url.split("/");
+    return arr[arr.length - 2];
+  } catch (error) {
+    return "";
+  }
+};
+
+/* get likes based on user when loading next or previous page */
+const fetchLikes = async () => {
+  const ids = results.value.map((item) => {
+    return getId(item.url);
+  });
+  const data = await getUserLikes(ids);
+  likes.value = data;
+};
+
+await fetchLikes();
+
+/* like item */
+const likeItem = async (itemId) => {
+  const like = await addUserLike({
+    itemId: itemId,
+    userId: user.id,
+  });
+  const tempLikes = { ...likes.value };
+  if (tempLikes[like.itemId]) {
+    tempLikes[like.itemId].push(like);
+  } else {
+    tempLikes[like.itemId] = [like];
+  }
+  likes.value = { ...tempLikes };
+};
+
+/* unlike item */
+const unlikeItem = async ({ id, itemId }) => {
+  const index = likes.value[+itemId].findIndex((like) => like.id == id);
+  const tempLikes = { ...likes.value };
+  tempLikes[+itemId].splice(index, 1);
+  likes.value = { ...tempLikes };
+  await removeUserLike(id);
+};
+
+/* item likes count array */
+const itemLikes = (item) => {
+  return likes.value[item] || [];
+};
+</script>
+
+<template>
+...
+      <Card
+        v-for="ship in results"
+        :starship="ship"
+        :user-id="user ? user.id : undefined"
+        :likes="itemLikes(getId(ship.url))"
+        :key="ship.name"
+        @like-item="likeItem"
+        @unlike-item="unlikeItem"
+      />
+...
+</template>
+
+```
+
+
+## Preline UI Framework
+
+In order to make our lives easier designing the interface for showing charts, there's a really cool library called Preline I'll be using for this app.
+
+Preline has great documentation on how to install the meta UI framework to Nuxt 3 here: https://preline.co/docs/frameworks-nuxtjs.html 
+
+Specifically, the OffCanvas component will be implemented in this tutorial: https://preline.co/docs/offcanvas.html 
+
+I will add this component shortly.
+
+
+## Chart.js + Nuxt 3
+
+```
+$ npm i vue-chartjs chart.js 
+
+```
+
+Also must add __build__ to the content object in ```nuxt.config.ts```:
+
+```
+build: {
+    transpile: ['chart.js']
+  }
+
+```
+
+Reference: https://vue-chartjs.org/guide/#using-with-nuxt 
+
+
+There's a number of different charts that can be used with Nuxt 3 and Chart.js but this tutorial will use the Polar Area chart.
 
 
 
-## Preline and TailwindCSS
+
 
 
 
@@ -1602,27 +1866,5 @@ export default function matchPlayerImage(player) {
     }
 
 ```
-
-Next, navigate to the components folder and visit.
-
-
-
-## Chart.js + Nuxt 3
-
-```
-$ npm i vue-chartjs chart.js 
-
-```
-
-Also must add __build__ to the content object in nuxt.config.ts:
-
-```
-build: {
-    transpile: ['chart.js']
-  }
-
-```
-
-Reference: https://vue-chartjs.org/guide/#using-with-nuxt  
 
 ======================= 
