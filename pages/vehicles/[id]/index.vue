@@ -2,19 +2,18 @@
   <div class="container mx-auto mt-6">
     <div class="gap-3 px-4">
       <item-card
-        v-if="ship"
-        :name="ship.name"
-        :model="ship.model"
-        :manufacturer="ship.manufacturer"
-        :cargo_capacity="ship.cargo_capacity"
-        :starship_class="ship.starship_class"
-        :cost_in_credits="ship.cost_in_credits"
-        :crew="ship.crew"
-        :passengers="ship.passengers"
-        :hyperdrive_rating="ship.hyperdrive_rating"
+        v-if="vehicle"
+        :name="vehicle.name"
+        :model="vehicle.model"
+        :manufacturer="vehicle.manufacturer"
+        :cargo_capacity="vehicle.cargo_capacity"
+        :vehicle_class="vehicle.vehicle_class"
+        :cost_in_credits="vehicle.cost_in_credits"
+        :crew="vehicle.crew"
+        :passengers="vehicle.passengers"
         :likes="itemLikes"
         :userId="user ? user.id : undefined"
-        :id="getId(ship.url)"
+        :id="getId(vehicle.url)"
         @unlike-item="unlikeItem"
         @like-item="likeItem"
       />
@@ -35,8 +34,8 @@ const itemLikes = ref(null);
 const loading = ref(false);
 loading.value = true;
 
-const { data: ship } = await useFetch(
-  `https://swapi.dev/api/starships/${route.params.id}`, {
+const { data: vehicle } = await useFetch(
+  `https://swapi.dev/api/vehicles/${route.params.id}`, {
     initialCache: false 
   }
 );

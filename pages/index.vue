@@ -95,29 +95,13 @@ const user = useState("user");
             </p>
             <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
               <NuxtLink to="/starships">
-                <div class="rounded-md shadow mt-2">
+                <div class="rounded-md shadow mt-2 mr-2">
                   <a
                     class="flex w-full items-center justify-center rounded-md border border-transparent bg-orange-700 px-6 py-2 text-base font-medium text-white hover:bg-orange-500 md:py-2 md:px-6 md:text-lg"
                     >View Ships</a
                   >
                 </div>
               </NuxtLink>
-             <!--  <NuxtLink v-if="!user" to="/login">
-                <div class="rounded-md shadow sm:ml-4 mt-2">
-                  <a
-                    class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-900 px-6 py-2 text-base font-medium text-white hover:bg-orange-500 md:py-2 md:px-6 md:text-lg"
-                    >Login</a
-                  >
-                </div>
-              </NuxtLink>
-              <NuxtLink v-if="!user" to="/register">
-                <div class="rounded-md shadow sm:ml-4 mt-2">
-                  <a
-                    class="flex w-full items-center justify-center rounded-md border border-transparent bg-gray-900 px-6 py-2 text-base font-medium text-white hover:bg-orange-500 md:py-2 md:px-6 md:text-lg"
-                    >Register</a
-                  >
-                </div>
-              </NuxtLink> -->
             </div>
           </div>
         </main>
