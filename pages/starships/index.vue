@@ -5,6 +5,8 @@ const user = await useUser();
 
 const route = useRoute();
 
+console.log(route.params, "route");
+
 const item = ref(null);
 const results = ref({});
 const count = ref("");
@@ -71,6 +73,7 @@ const likeItem = async (itemId) => {
     itemId: itemId,
     userId: user.id,
   });
+
   const tempLikes = { ...likes.value };
   if (tempLikes[like.itemId]) {
     tempLikes[like.itemId].push(like);
@@ -94,17 +97,16 @@ const itemLikes = (item) => {
   return likes.value[item] || [];
 };
 
-
+/* show specific item when clicked */
 async function showItem(id, p) {
   item.value = null;
-  const { data } = await useFetch(
-  `https://swapi.dev/api/starships/${route.params.id}`, {
-  }
-);
+  const { data } = await useFetch(`https://swapi.dev/api/starships/${id}`, {
+    initialCache: false 
+  });
+  console.log(data.value, "data");
 
   item.value = {
-    ...data.value.results[0],
-    stats: res[1].data.value.stats[0].splits[0],
+    ...data.value
   };
 }
 </script>

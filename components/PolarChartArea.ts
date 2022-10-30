@@ -57,8 +57,8 @@ export default defineComponent({
             labels: [
                 'cargo',
                 'cost',
-                'crew',
-                'passengers',
+                'max speed',
+                'length',
                 ...props.labels
             ],
             datasets: [
@@ -74,8 +74,8 @@ export default defineComponent({
                     data: [
                         props.stats?.cargo_capacity,
                         props.stats?.cost_in_credits,
-                        props.stats?.crew,
-                        props.stats?.passengers,
+                        props.stats?.max_atmosphering_speed,
+                        props.stats?.length,
                         props.stats
                     ]
                 },

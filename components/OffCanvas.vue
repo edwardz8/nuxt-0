@@ -46,7 +46,7 @@ const props = defineProps(["item"]);
           alt="Item Profile"
         /> -->
         <div v-if="item">
-          <PolarAreaChart :stats="item.stats.stat" />
+          <PolarAreaChart :stats="item" />
         </div>
         <div v-else class="h-96 flex items-center justify-center">
           <div
